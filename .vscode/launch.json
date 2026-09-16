@@ -1,0 +1,51 @@
+{
+  // Every configuration passes the backend values through
+  // --dart-define-from-file. Without them the app has no SUPABASE_URL or
+  // SUPABASE_ANON_KEY compiled in and stops on the "build is not configured"
+  // screen, which is why the plain Run button must never be used bare.
+  //
+  // The "(local backend)" entries expect tools/local_backend/start.ps1 to be
+  // running; see tools/local_backend/README.md.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Web - Chrome (local backend)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "deviceId": "chrome",
+      "toolArgs": ["--dart-define-from-file=dart_defines/local.json"]
+    },
+    {
+      "name": "Android / attached device (local backend)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      // An emulator reaches the host's loopback through 10.0.2.2, not
+      // 127.0.0.1, which on the device means the device itself. A physical
+      // handset needs the workstation's LAN address instead - and the gateway
+      // binds to loopback only, so forward the port rather than re-binding it:
+      //   adb reverse tcp:54321 tcp:54321
+      // With that forward in place 127.0.0.1 works on the device too, so no
+      // override of SUPABASE_URL is needed here.
+      "toolArgs": ["--dart-define-from-file=dart_defines/local.json"]
+    },
+    {
+      "name": "Windows desktop (local backend)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "deviceId": "windows",
+      "toolArgs": ["--dart-define-from-file=dart_defines/local.json"]
+    },
+    {
+      "name": "Web - Chrome (profile mode)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "deviceId": "chrome",
+      "flutterMode": "profile",
+      "toolArgs": ["--dart-define-from-file=dart_defines/local.json"]
+    }
+  ]
+}

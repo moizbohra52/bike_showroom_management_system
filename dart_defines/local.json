@@ -1,0 +1,17 @@
+{
+  "_comment_1": "Build configuration for the LOCAL development backend (tools/local_backend/). Consumed via --dart-define-from-file, which is what makes the IDE's plain Run button work - without it the app starts with no backend values and shows the 'build is not configured' screen.",
+  "_comment_2": "SUPABASE_ANON_KEY below is not a secret. It is a JWT carrying role=anon, signed with the development secret that is already in tools/local_backend/gateway.py, and it is only accepted by a gateway running on this machine's loopback interface. It grants nothing on its own - every request it makes is still filtered by Row Level Security.",
+  "_comment_3": "NEVER add a real project's keys to this file. Real keys belong in CI secrets and are passed with --dart-define at build time; see docs/DEPLOYMENT.md.",
+
+  "APP_ENV": "development",
+  "SUPABASE_URL": "http://127.0.0.1:54321",
+  "SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJic21zLWxvY2FsLWdhdGV3YXkiLCJyb2xlIjoiYW5vbiIsImF1ZCI6ImF1dGhlbnRpY2F0ZWQiLCJpYXQiOjE3MDAwMDAwMDAsImV4cCI6MjMzMDcyMDAwMH0.vVGY3v9CKi6FpgQqxfSg-HJlWJJW26CudrSRqFM_L-U",
+
+  "ENABLE_LOGGING": "true",
+  "ENABLE_NETWORK_LOGGING": "false",
+
+  "_comment_4": "Realtime and Storage are not emulated by the local gateway - it answers 501 on both. Leaving realtime on would retry a websocket that can never connect.",
+  "ENABLE_REALTIME": "false",
+  "ENABLE_OFFLINE_MODE": "true",
+  "ENABLE_CRASH_REPORTING": "false"
+}

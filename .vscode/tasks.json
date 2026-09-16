@@ -1,0 +1,56 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Local backend: start",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy", "Bypass",
+        "-File", "${workspaceFolder}/tools/local_backend/start.ps1"
+      ],
+      // The gateway runs in the foreground and never exits, so this is a
+      // long-running task rather than a build step. Leave the terminal open
+      // while working; the panel is where sign-in and REST traffic is logged.
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": { "panel": "dedicated", "reveal": "always" }
+    },
+    {
+      "label": "Local backend: start (rebuild database)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy", "Bypass",
+        "-File", "${workspaceFolder}/tools/local_backend/start.ps1",
+        "-Init"
+      ],
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": { "panel": "dedicated", "reveal": "always" }
+    },
+    {
+      "label": "Local backend: stop",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy", "Bypass",
+        "-File", "${workspaceFolder}/tools/local_backend/stop.ps1"
+      ],
+      "problemMatcher": [],
+      "presentation": { "panel": "shared", "reveal": "always" }
+    },
+    {
+      "label": "Local backend: list users",
+      "type": "shell",
+      "command": "python",
+      "args": [
+        "${workspaceFolder}/tools/local_backend/gateway.py",
+        "list-users"
+      ],
+      "options": { "env": { "BSMS_PGDATABASE": "bsms_dev" } },
+      "problemMatcher": [],
+      "presentation": { "panel": "shared", "reveal": "always" }
+    }
+  ]
+}
