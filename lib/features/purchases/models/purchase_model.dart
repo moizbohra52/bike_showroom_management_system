@@ -123,8 +123,10 @@ class PurchaseModel implements SyncableModel {
 
   /// How many units the order expects, summed across its lines. This is the
   /// number of `inventory` rows receiving it should create.
-  int get expectedUnitCount =>
-      items.fold<int>(0, (int sum, PurchaseItemModel i) => sum + i.quantity.round());
+  int get expectedUnitCount => items.fold<int>(
+    0,
+    (int sum, PurchaseItemModel i) => sum + i.quantity.round(),
+  );
 
   String get formattedTotal => MoneyUtil.format(totalAmount);
 

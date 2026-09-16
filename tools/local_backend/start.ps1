@@ -108,11 +108,18 @@ Get-Process postgrest -ErrorAction SilentlyContinue | Stop-Process -Force
 Start-Sleep -Milliseconds 500
 
 $conf = Join-Path $localdev 'postgrest\postgrest.conf'
+# `server-host` is load-bearing. PostgREST defaults to !4 — every IPv4
+# interface — so without this line the database is reachable from the whole
+# local network, authenticated only by a JWT signed with the development
+# secret that is committed to this repository. The gateway in front of it
+# binds to loopback; this makes PostgREST behind it do the same, so the claim
+# that the local backend is loopback-only is actually true.
 $confText = @"
 db-uri = "postgres://postgres@127.0.0.1:$PgPort/$Database"
 db-schemas = "public"
 db-anon-role = "anon"
 jwt-secret = "this-is-a-local-test-only-jwt-secret-32chars-min"
+server-host = "127.0.0.1"
 server-port = $PostgrestPort
 db-pool = 5
 log-level = "error"

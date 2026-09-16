@@ -132,11 +132,18 @@ class ExpenseModel implements SyncableModel {
 
   /// Whether [userId] may act on this expense's approval.
   ///
-  /// Mirrors `approve_expense`'s own guard: only a pending expense can be
-  /// decided, and never by the person who recorded it. Hiding the button is a
-  /// courtesy — the server refuses it regardless.
-  bool canBeDecidedBy(String? userId) =>
-      isPending && userId != null && createdBy != userId;
+  /// Mirrors `approve_expense`'s own guard exactly: only a pending expense can
+  /// be decided, and not by the person who recorded it — **unless** they are a
+  /// super admin, whom the function exempts. Matching the exemption matters:
+  /// a stricter client would hide the button from the one account that is
+  /// allowed to use it, which on a single-administrator installation makes
+  /// approval look broken.
+  bool canBeDecidedBy(String? userId, {bool isSuperAdmin = false}) {
+    if (!isPending || userId == null) {
+      return false;
+    }
+    return isSuperAdmin || createdBy != userId;
+  }
 
   bool get requiresReference =>
       paymentMethod != PaymentMethod.cash &&

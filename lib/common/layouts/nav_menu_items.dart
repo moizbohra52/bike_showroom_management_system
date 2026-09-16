@@ -99,6 +99,24 @@ class NavMenuItems {
       permission: AppPermissions.emiView,
     ),
     NavMenuItem(
+      label: 'Purchases',
+      icon: Icons.shopping_cart_outlined,
+      route: AppRoutes.purchases,
+      permission: AppPermissions.purchasesView,
+    ),
+    NavMenuItem(
+      label: 'Expenses',
+      icon: Icons.receipt_outlined,
+      route: AppRoutes.expenses,
+      permission: AppPermissions.expensesView,
+    ),
+    NavMenuItem(
+      label: 'Accounting',
+      icon: Icons.account_balance_outlined,
+      route: AppRoutes.accounting,
+      permission: AppPermissions.accountingView,
+    ),
+    NavMenuItem(
       label: 'Users',
       icon: Icons.manage_accounts_outlined,
       route: AppRoutes.users,

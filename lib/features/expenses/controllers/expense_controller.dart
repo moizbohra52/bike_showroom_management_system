@@ -36,6 +36,10 @@ class ExpenseController extends ListController<ExpenseModel> {
   /// The signed-in user, so the list can tell whose expenses they may decide.
   String? get currentUserId => Get.find<SessionController>().userId;
 
+  /// A super admin is exempt from the self-approval rule, matching
+  /// `approve_expense`.
+  bool get isSuperAdmin => Get.find<SessionController>().isSuperAdmin;
+
   void filterByStatus(ExpenseStatus? status) {
     statusFilter.value = status;
     if (status == null) {
@@ -142,7 +146,8 @@ class ExpenseFormController extends GetxController {
   }
 
   /// Net amount plus the tax entered — what the total will be.
-  double get total => _numberOf(amountController) + _numberOf(taxAmountController);
+  double get total =>
+      _numberOf(amountController) + _numberOf(taxAmountController);
 
   @override
   void onInit() {
@@ -192,22 +197,21 @@ class ExpenseFormController extends GetxController {
 
     isSubmitting.value = true;
     try {
-      final String expenseId = await expenseRepository.createExpense(
-        <String, Object?>{
-          'showroom_id': id,
-          'category_id': categoryId.value,
-          'amount': _numberOf(amountController),
-          'tax_amount': _numberOf(taxAmountController),
-          'expense_date': DateUtil.toIsoDateOrNull(expenseDate.value),
-          'payment_method': paymentMethod.value.value,
-          if (vendorController.text.trim().isNotEmpty)
-            'vendor_name': vendorController.text.trim(),
-          if (referenceController.text.trim().isNotEmpty)
-            'reference_number': referenceController.text.trim(),
-          if (descriptionController.text.trim().isNotEmpty)
-            'description': descriptionController.text.trim(),
-        },
-      );
+      final String expenseId = await expenseRepository
+          .createExpense(<String, Object?>{
+            'showroom_id': id,
+            'category_id': categoryId.value,
+            'amount': _numberOf(amountController),
+            'tax_amount': _numberOf(taxAmountController),
+            'expense_date': DateUtil.toIsoDateOrNull(expenseDate.value),
+            'payment_method': paymentMethod.value.value,
+            if (vendorController.text.trim().isNotEmpty)
+              'vendor_name': vendorController.text.trim(),
+            if (referenceController.text.trim().isNotEmpty)
+              'reference_number': referenceController.text.trim(),
+            if (descriptionController.text.trim().isNotEmpty)
+              'description': descriptionController.text.trim(),
+          });
       AppSnackbar.success('Expense recorded and sent for approval.');
       return expenseId;
     } on Object catch (e) {

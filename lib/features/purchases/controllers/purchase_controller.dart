@@ -27,10 +27,7 @@ class PurchaseController extends ListController<PurchaseModel> {
   PurchaseController({required PurchaseRepository repository})
     : super(
         repository: repository,
-        searchColumns: const <String>[
-          'purchase_number',
-          'supplier_invoice_no',
-        ],
+        searchColumns: const <String>['purchase_number', 'supplier_invoice_no'],
       );
 
   final Rxn<PurchaseStatus> statusFilter = Rxn<PurchaseStatus>();
@@ -178,11 +175,7 @@ class PurchaseCreateController extends GetxController {
     lines.refresh();
   }
 
-  void updateLine(
-    PurchaseLineDraft line, {
-    double? unitCost,
-    int? quantity,
-  }) {
+  void updateLine(PurchaseLineDraft line, {double? unitCost, int? quantity}) {
     if (unitCost != null) {
       line.unitCost = unitCost;
     }
@@ -235,22 +228,21 @@ class PurchaseCreateController extends GetxController {
 
     isSubmitting.value = true;
     try {
-      final String purchaseId = await purchaseRepository.createPurchase(
-        <String, Object?>{
-          'showroom_id': id,
-          'supplier_id': supplierId.value,
-          'purchase_date': DateUtil.toIsoDateOrNull(purchaseDate.value),
-          'items': lines
-              .map((PurchaseLineDraft line) => line.toPayload())
-              .toList(growable: false),
-          'discount': _numberOf(discountController),
-          'other_charges': _numberOf(otherChargesController),
-          if (supplierInvoiceController.text.trim().isNotEmpty)
-            'supplier_invoice_no': supplierInvoiceController.text.trim(),
-          if (notesController.text.trim().isNotEmpty)
-            'notes': notesController.text.trim(),
-        },
-      );
+      final String purchaseId = await purchaseRepository
+          .createPurchase(<String, Object?>{
+            'showroom_id': id,
+            'supplier_id': supplierId.value,
+            'purchase_date': DateUtil.toIsoDateOrNull(purchaseDate.value),
+            'items': lines
+                .map((PurchaseLineDraft line) => line.toPayload())
+                .toList(growable: false),
+            'discount': _numberOf(discountController),
+            'other_charges': _numberOf(otherChargesController),
+            if (supplierInvoiceController.text.trim().isNotEmpty)
+              'supplier_invoice_no': supplierInvoiceController.text.trim(),
+            if (notesController.text.trim().isNotEmpty)
+              'notes': notesController.text.trim(),
+          });
       AppSnackbar.success('Purchase order raised.');
       return purchaseId;
     } on Object catch (e) {
@@ -411,18 +403,16 @@ class PurchaseDetailsController extends GetxController {
 
     isReceiving.value = true;
     try {
-      final int created = await purchaseRepository.receivePurchase(
-        <String, Object?>{
-          'purchase_id': detail.value.id,
-          'units': units
-              .map(
-                (ReceivedUnitDraft u) => u.toPayload(
-                  unitCost: unitCostFor(u.productId),
-                ),
-              )
-              .toList(growable: false),
-        },
-      );
+      final int created = await purchaseRepository
+          .receivePurchase(<String, Object?>{
+            'purchase_id': detail.value.id,
+            'units': units
+                .map(
+                  (ReceivedUnitDraft u) =>
+                      u.toPayload(unitCost: unitCostFor(u.productId)),
+                )
+                .toList(growable: false),
+          });
       AppSnackbar.success('$created unit(s) taken into stock.');
       await load();
       return true;

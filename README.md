@@ -15,8 +15,9 @@ codebase.
 | Windows | **Not verified here** | Needs the MSVC "Desktop development with C++" workload; this machine has only SQL Server Management Studio, which Flutter misreports as Visual Studio |
 | iOS | **Not verifiable here** | Requires macOS and Xcode |
 
-Static analysis reports no errors under a strict ruleset, and the test suite
-passes (153 tests, plus three live-server integration suites under
+Static analysis is completely clean (`dart analyze` — no issues at all) under a
+strict ruleset, and the test suite
+passes (172 tests, plus four live-server integration suites under
 `test/integration/` that are skipped unless pointed at a running backend —
 see `supabase/tests/README.md`, or `tools/local_backend/` to bring one up with
 no Supabase account).
@@ -253,7 +254,7 @@ database, auth service, session/RBAC controller, route guards, auth screens.
 
 **Phase 2 — Database: complete and verified.**
 
-16 migrations covering 46 tables, 18 reporting views, 236 indexes, 69
+18 migrations covering 46 tables, 18 reporting views, 236 indexes, 69
 functions, 100 triggers, 157 RLS policies and 9 storage buckets.
 
 All of it executed against a real PostgreSQL 17 database:
@@ -392,9 +393,59 @@ to stock, and the trial balance still summing debits to credits afterwards.
 
 Across all three live suites: **34/34**.
 
-**Phases 6–11 — outstanding.**
+**Phase 6 — Purchases, expenses, accounting: complete and verified.**
 
-6. Purchases, expenses, accounting screens
+The other side of the same ledger a sale posts to:
+
+- **Purchases**: `create_purchase_transaction` raises the order and posts the
+  payable; **receiving is a separate act** through `receive_purchase`, because
+  ordering and delivery happen days apart and the chassis numbers are not
+  known until the lorry arrives. The receiving screen expands each line's
+  quantity into that many chassis/engine entries and requires all of them —
+  the RPC marks the whole order RECEIVED and refuses a second attempt, so a
+  half-entered consignment would strand the remaining machines.
+- **Suppliers**: shared across branches, like brands and financiers, so one
+  distributor's payable balance is not fragmented per showroom.
+- **Expenses**: `create_expense_transaction` posts the double-entry pair
+  against the category's account. Approval enforces **separation of duties** —
+  you cannot approve an expense you recorded — with an explicit super-admin
+  exemption the client now mirrors exactly.
+- **Accounting**: the chart of accounts (identical codes at every branch, which
+  is what lets branch figures be summed), the journal with every posting and
+  its lines, and the trial balance, which states plainly whether debits equal
+  credits rather than leaving the reader to add up.
+
+### A real defect this phase found
+
+`receive_purchase` credited the supplier with the purchase's **full total**
+while debiting only the goods and the tax. `other_charges` was on the credit
+side and nowhere on the debit side, so any consignment with freight was
+**impossible to receive**: `assert_ledger_balanced` refused the transaction and
+rolled the whole thing back with
+
+```
+Accounting entry is not balanced: debits 192000.00, credits 194000.00
+```
+
+A purchase with no freight balanced by coincidence, which is why it survived
+until one with freight was actually received.
+[`017_fix_purchase_receipt_balance.sql`](supabase/migrations/017_fix_purchase_receipt_balance.sql)
+adds the missing debit to `5104 Transport Expense`. It is **expensed rather
+than capitalised into `1004 Inventory` deliberately**: `inventory.purchase_price`
+is what cost of goods sold is derived from, so account 1004 must stay equal to
+the sum of per-unit costs or the asset account and the stock ledger drift apart
+permanently.
+
+**172 Dart tests pass** (up from 153), and a fourth live-server suite
+(`test/integration/ledger_repositories_integration_test.dart`, **11/11**) runs
+the purchase-to-ledger path end to end — including the freight case that used
+to fail. All 18 migrations still apply cleanly, in order, to a brand-new
+database.
+
+Across all four live suites: **45/45**.
+
+**Phases 7–11 — outstanding.**
+
 7. Service, warranty, insurance screens
 8. Reminders, notifications, FCM wiring
 9. Reports, PDF, Excel/CSV export
@@ -403,9 +454,9 @@ Across all three live suites: **34/34**.
 
 The server contract is fixed and proven, and the repository/list-controller
 base plus the navigation shell mean each remaining feature is now a smaller
-increment than the last one was. The money path is now closed end to end —
-stock in, sold, invoiced, collected, financed and reconciled — so Phase 6
-(purchases and expenses) is the other side of the same ledger.
+increment than the last one was. Money now flows end to end and balances:
+bought, received, sold, invoiced, collected, financed, expensed and
+reconciled, with the trial balance to prove it.
 
 ---
 

@@ -1,4 +1,8 @@
 import 'package:bike_showroom_management_system/core/constants/permission_constants.dart';
+import 'package:bike_showroom_management_system/features/accounting/bindings/accounting_binding.dart';
+import 'package:bike_showroom_management_system/features/accounting/views/chart_of_accounts_view.dart';
+import 'package:bike_showroom_management_system/features/accounting/views/journal_view.dart';
+import 'package:bike_showroom_management_system/features/accounting/views/trial_balance_view.dart';
 import 'package:bike_showroom_management_system/features/auth/bindings/auth_binding.dart';
 import 'package:bike_showroom_management_system/features/auth/views/account_blocked_view.dart';
 import 'package:bike_showroom_management_system/features/auth/views/forgot_password_view.dart';
@@ -14,6 +18,10 @@ import 'package:bike_showroom_management_system/features/customers/views/custome
 import 'package:bike_showroom_management_system/features/dashboard/views/dashboard_view.dart';
 import 'package:bike_showroom_management_system/features/emi/bindings/emi_binding.dart';
 import 'package:bike_showroom_management_system/features/emi/views/emi_dashboard_view.dart';
+import 'package:bike_showroom_management_system/features/expenses/bindings/expense_binding.dart';
+import 'package:bike_showroom_management_system/features/expenses/views/expense_category_list_view.dart';
+import 'package:bike_showroom_management_system/features/expenses/views/expense_form_view.dart';
+import 'package:bike_showroom_management_system/features/expenses/views/expense_list_view.dart';
 import 'package:bike_showroom_management_system/features/finance/bindings/finance_binding.dart';
 import 'package:bike_showroom_management_system/features/finance/views/finance_company_list_view.dart';
 import 'package:bike_showroom_management_system/features/finance/views/loan_details_view.dart';
@@ -29,6 +37,11 @@ import 'package:bike_showroom_management_system/features/products/bindings/produ
 import 'package:bike_showroom_management_system/features/products/views/brand_list_view.dart';
 import 'package:bike_showroom_management_system/features/products/views/product_form_view.dart';
 import 'package:bike_showroom_management_system/features/products/views/product_list_view.dart';
+import 'package:bike_showroom_management_system/features/purchases/bindings/purchase_binding.dart';
+import 'package:bike_showroom_management_system/features/purchases/views/purchase_create_view.dart';
+import 'package:bike_showroom_management_system/features/purchases/views/purchase_details_view.dart';
+import 'package:bike_showroom_management_system/features/purchases/views/purchase_list_view.dart';
+import 'package:bike_showroom_management_system/features/purchases/views/supplier_list_view.dart';
 import 'package:bike_showroom_management_system/features/roles/bindings/role_binding.dart';
 import 'package:bike_showroom_management_system/features/roles/views/role_form_view.dart';
 import 'package:bike_showroom_management_system/features/roles/views/role_list_view.dart';
@@ -350,6 +363,80 @@ class AppPages {
       name: AppRoutes.emiDashboard,
       page: () => const EmiDashboardView(),
       binding: EmiBinding(),
+      middlewares: _protected,
+    ),
+
+    // -------------------------------------------------------- purchases
+    GetPage<void>(
+      name: AppRoutes.suppliers,
+      page: () => const SupplierListView(),
+      binding: SupplierBinding(),
+      middlewares: _protected,
+    ),
+    GetPage<void>(
+      name: AppRoutes.purchases,
+      page: () => const PurchaseListView(),
+      binding: PurchaseBinding(),
+      middlewares: _protected,
+    ),
+    GetPage<void>(
+      name: AppRoutes.purchaseCreate,
+      page: () => const PurchaseCreateView(),
+      binding: PurchaseCreateBinding(),
+      middlewares: _protected,
+    ),
+    GetPage<void>(
+      name: AppRoutes.purchaseDetails,
+      page: () => const PurchaseDetailsView(),
+      binding: PurchaseDetailsBinding(),
+      middlewares: _protected,
+    ),
+
+    // --------------------------------------------------------- expenses
+    GetPage<void>(
+      name: AppRoutes.expenses,
+      page: () => const ExpenseListView(),
+      binding: ExpenseBinding(),
+      middlewares: _protected,
+    ),
+    GetPage<void>(
+      name: AppRoutes.expenseForm,
+      page: () => const ExpenseFormView(),
+      binding: ExpenseFormBinding(),
+      middlewares: _protected,
+    ),
+    GetPage<void>(
+      name: AppRoutes.expenseCategories,
+      page: () => const ExpenseCategoryListView(),
+      binding: ExpenseCategoryBinding(),
+      middlewares: _protected,
+    ),
+
+    // ------------------------------------------------------- accounting
+    // `accounting` and `chartOfAccounts` are the same screen: the chart is
+    // the entry point, with the journal and trial balance reached from it.
+    GetPage<void>(
+      name: AppRoutes.accounting,
+      page: () => const ChartOfAccountsView(),
+      binding: AccountingBinding(),
+      middlewares: _protected,
+    ),
+    GetPage<void>(
+      name: AppRoutes.chartOfAccounts,
+      page: () => const ChartOfAccountsView(),
+      binding: AccountingBinding(),
+      middlewares: _protected,
+    ),
+    GetPage<void>(
+      name: AppRoutes.trialBalance,
+      page: () => const TrialBalanceView(),
+      binding: AccountingBinding(),
+      middlewares: _protected,
+    ),
+    GetPage<void>(
+      name: AppRoutes.journal,
+      page: () => const JournalView(),
+      binding: JournalBinding(),
       middlewares: _protected,
     ),
 
